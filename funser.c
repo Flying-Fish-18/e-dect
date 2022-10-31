@@ -125,3 +125,39 @@ int do_login(int newfd,char *user,sqlite3 *db)
     }
     return 0;
 }
+
+int do_translate(int newfd,char *data,sqlite3 *db)
+{
+    char buff[200] = "";
+    char word[50] = "";
+    char mean[150] = "";
+    char opr[200] = "";
+
+    strcpy(word,data); // 用户上传的单词
+
+    char **p_res;
+    int prow;
+    int pcol;
+    sprintf(opr,"select mean from wordbox where word == \"%s\";",word);
+    if (sqlite3_get_table(db, opr, &p_res, &prow, &pcol,NULL) != SQLITE_OK)
+          PRINT_SQL("select word and mean from wordbox\n", -1);
+    if (0 == prow) // 单词不存在
+    {
+        buff[0] = 0;
+        send(newfd, buff, sizeof(buff), 0);
+    }
+    else  // 发送单词和翻译
+    {
+        sprintf(buff,"%s%c%s",word,0,p_res[1]);
+        for (int i = 2; i <= prow; i++)
+        {
+            sprintf(buff+strlen(word)+strlen(p_res[1])+1 \
+                ,"%c%s",' ',p_res[i]) ;
+        }
+        
+        if(send(newfd, buff, sizeof(buff), 0) < 0)
+            PRINT_ERR("send translate",-1);
+    }
+    // recv(newfd,buff,sizeof(buff),0);
+    return 0;
+}

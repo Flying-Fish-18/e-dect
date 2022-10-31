@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sqlite3.h>
 #include <strings.h>
 #include <string.h>
@@ -27,7 +28,7 @@ int menu()
     printf("2.登录账号\n");
     printf("3.退出\n");
 
-    printf("\n请选择功能");
+    printf("\n请选择功能: ");
     int a = 0;
     while (1)
     {
@@ -183,20 +184,22 @@ int option(int sfd)
     int flag;
     while (1)
     {
+        system("clear");
         printf("------您已登陆----------\n");
         printf("    1.单词翻译\n");
         printf("    2.查看历史记录\n");
         printf("    3.退出程序\n");
         printf("\n请输入功能号:");
-        scanf("%d",flag);
+        scanf("%d",&flag);
         getchar();
         switch (flag)
         {
         case 1:
+            system("clear");
             do_translate(sfd);
             break;
         case 2:
-            do_history(sfd);
+            // do_history(sfd);
             break;
         case 3:
             close(sfd);
@@ -205,9 +208,49 @@ int option(int sfd)
         default:
             printf("程序出错\n");
             getchar();
-            system("clear");
         }
     }
+
+    return 0;
+}
+
+int do_translate(int sfd)
+{
+    char buff[200] = "";
+    char word[50] = "";
+    char mean[150] = "";
+    int res;
+    printf("(按#号键退出)\n");
+    while(1)
+    {
+        printf("请输入要查询的单词:");
+        scanf("%s",word);  // 输入要翻译的单词
+        getchar();
+        if('#' == word[0])
+            break;
+                // 组数据
+        sprintf(buff,"%c%s",2,word);  // 数据头为 2
+        if(send(sfd,buff,sizeof(buff),0) < 0)
+            PRINT_ERR("send word",-1);
+
+        res = recv(sfd,buff,sizeof(buff),0);
+        if(res < 0)
+            PRINT_ERR("recv word and mean",-1);
+        else if(0 == res)
+            PRINT("对方已下线\n",-2);
+        
+        if(0 == buff[0])  // 单词不存在
+        {
+            printf("\n单词查找,请重新输入!!\n\nn");
+            continue;
+        }
+        strcpy(word,buff);  // 复制单词
+        strcpy(mean,buff+strlen(word)+1);  // 复制翻译
+        
+        printf("\n\t%s\t\t%s\n\n",word,mean);
+    }
+    
+
 
     return 0;
 }

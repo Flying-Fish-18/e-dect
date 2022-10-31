@@ -23,5 +23,6 @@
 sqlite3 *load_sql(char *path);
 int bindaddr(int sfd,int port,char *ip);
 int do_register(int newfd, char *username, sqlite3 *db);
-int do_login();
+int do_login(int newfd,char *user, sqlite3 *db);
+int do_translate(int newfd,char *data, sqlite3 *db);
 #endif

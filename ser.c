@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
         PRINT_ERR("listen", -1);
 
     signal(17, handler);
-    char buff[100] = "";
+    char buff[200] = "";
     int res;
     int newfd;
     while (1)
@@ -75,11 +75,14 @@ int main(int argc, char const *argv[])
                 {
                     do_register(newfd, buff + 1, db);
                 }
-                else if(1 == buff[0])
+                else if(1 == buff[0])  // 登录
                 {
                     do_login(newfd,buff+1,db);
                 }
-                
+                else if(2 == buff[0])  // 单词翻译
+                {
+                    do_translate(newfd,buff+1,db);
+                }
             }
         }
     }
