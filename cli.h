@@ -25,4 +25,5 @@ int connectaddr(int sfd);
 int menu();
 int do_register(int sfd);
 int do_login(int sfd);
+int option(int sfd);
 #endif

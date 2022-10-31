@@ -19,7 +19,6 @@ int main(int argc, char const *argv[])
 
     system("clear");
     char buff[100] = "";
-    int res;
     while (1)
     {
         switch (menu())
@@ -30,16 +29,19 @@ int main(int argc, char const *argv[])
                 break;
             case 2:
                 system("clear");
-                if(1 == do_login(sfd));
+                if(1 == do_login(sfd))
+                    option(sfd);
                 break;
             case 3:
-                // do_quit();
+                close(sfd);
+                return 0;
                 break;
             default:
                 printf("程序出错\n");
-            system("clear");
+                getchar();
+                system("clear");
         }
     }
-
+    close(sfd);
     return 0;
 }

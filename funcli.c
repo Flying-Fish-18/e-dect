@@ -176,3 +176,38 @@ int do_login(int sfd)
 
     return 0;
 }
+
+int option(int sfd)
+{
+    char buff[100] = "";
+    int flag;
+    while (1)
+    {
+        printf("------您已登陆----------\n");
+        printf("    1.单词翻译\n");
+        printf("    2.查看历史记录\n");
+        printf("    3.退出程序\n");
+        printf("\n请输入功能号:");
+        scanf("%d",flag);
+        getchar();
+        switch (flag)
+        {
+        case 1:
+            do_translate(sfd);
+            break;
+        case 2:
+            do_history(sfd);
+            break;
+        case 3:
+            close(sfd);
+            return 0;
+            break;
+        default:
+            printf("程序出错\n");
+            getchar();
+            system("clear");
+        }
+    }
+
+    return 0;
+}
