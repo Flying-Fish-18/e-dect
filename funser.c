@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <strings.h>
 #include <string.h>
+#include <time.h>
 #include <sqlite3.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -22,7 +23,7 @@ sqlite3 *load_sql(char *path) // 本地数据库加载，成功返回数据库�
     strcpy(opr, "create table if not exists user (username char,passwd char);");
     if (sqlite3_exec(db, opr, NULL, NULL, NULL) != SQLITE_OK)
         PRINT_SQL("sql exec", NULL);
-    strcpy(opr, "create table if not exists history (word char,mean char,time char);");
+    strcpy(opr, "create table if not exists history (word char,time char,username char);");
     if (sqlite3_exec(db, opr, NULL, NULL, NULL) != SQLITE_OK)
         PRINT_SQL("sql exec", NULL);
 
@@ -93,7 +94,7 @@ int do_register(int newfd, char *username, sqlite3 *db)
    return 0;
 }
 
-int do_login(int newfd,char *user,sqlite3 *db)
+int do_login(int newfd,char *user,sqlite3 *db,char *client)
 {
     printf("%s\n",user);
     char username[20] = "";
@@ -122,11 +123,13 @@ int do_login(int newfd,char *user,sqlite3 *db)
     {
         buff[0] = 1;
         send(newfd, buff, sizeof(buff), 0);
+        strcpy(client,username);
+        printf("%s\n",username);
     }
     return 0;
 }
 
-int do_translate(int newfd,char *data,sqlite3 *db)
+int do_translate(int newfd,char *data,sqlite3 *db,char *client)
 {
     char buff[200] = "";
     char word[50] = "";
@@ -158,6 +161,34 @@ int do_translate(int newfd,char *data,sqlite3 *db)
         if(send(newfd, buff, sizeof(buff), 0) < 0)
             PRINT_ERR("send translate",-1);
     }
-    // recv(newfd,buff,sizeof(buff),0);
+    
+    insert_history(word,db,client);
+
     return 0;
 }
+
+int insert_history(char *word,sqlite3 *db,char *client)
+{
+    // 获取时间
+    time_t now = time(NULL);
+    struct tm *tim = localtime(&now);
+    char time[50] = "";
+    sprintf(time,"%d.%d.%d  %d:%d:%d" \
+                ,tim->tm_year + 1900 \
+                ,tim->tm_mon + 1 \
+                ,tim->tm_mday \
+                ,tim->tm_hour \
+                ,tim->tm_min \
+                ,tim->tm_sec \
+                );
+    printf("%s\n",time);
+
+    char opr[200] = "";
+    sprintf(opr,"insert into history values (\"%s\",'%s',\"%s\");" \
+                ,word,time,client);
+    if (sqlite3_exec(db, opr, NULL, NULL, NULL) != SQLITE_OK)
+        PRINT_SQL("sql insert history",-1);
+}
+
+
+int do_history(int newfd,char *history,sqlite3 *db,char *client);

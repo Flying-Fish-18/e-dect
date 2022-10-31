@@ -55,6 +55,7 @@ int main(int argc, char const *argv[])
         else //  子线程通话
         {
             close(sfd);
+            char client[20] = "";
             while (1)
             {
                 memset(buff,0,sizeof(buff));
@@ -77,11 +78,15 @@ int main(int argc, char const *argv[])
                 }
                 else if(1 == buff[0])  // 登录
                 {
-                    do_login(newfd,buff+1,db);
+                    do_login(newfd,buff+1,db,client);
                 }
                 else if(2 == buff[0])  // 单词翻译
                 {
-                    do_translate(newfd,buff+1,db);
+                    do_translate(newfd,buff+1,db,client);
+                }
+                else if(3 == buff[0])  // 查看历史记录
+                {
+                    // do_history(newfd,buff+1,db,client);
                 }
             }
         }
