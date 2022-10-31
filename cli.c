@@ -21,14 +21,13 @@ int main(int argc, char const *argv[])
     char buff[100] = "";
     while (1)
     {
+        system("clear");
         switch (menu())
         {
             case 1: 
-                system("clear");
                 do_register(sfd);
                 break;
             case 2:
-                system("clear");
                 if(1 == do_login(sfd))
                     option(sfd);
                 break;
@@ -39,7 +38,6 @@ int main(int argc, char const *argv[])
             default:
                 printf("程序出错\n");
                 getchar();
-                system("clear");
         }
     }
     close(sfd);

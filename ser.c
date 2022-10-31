@@ -65,29 +65,49 @@ int main(int argc, char const *argv[])
                     PRINT_ERR("recv 子线程数据", -1);
                 else if (0 == res)
                 {
+                    underline(client,db);
+                    printf("%s已下线\n",client);
                     close(newfd);
-                    PRINT("对方已下线\n", -2);
+                    sqlite3_close(db);
+                    return 0;
                 }
-                else
-                    printf("%s\n", buff);
-
+               
 
                 if (0 == buff[0]) // 注册
                 {
-                    do_register(newfd, buff + 1, db);
+                    res = do_register(newfd, buff + 1, db);
                 }
                 else if(1 == buff[0])  // 登录
                 {
-                    do_login(newfd,buff+1,db,client);
+                    res = do_login(newfd,buff+1,db,client);
                 }
                 else if(2 == buff[0])  // 单词翻译
                 {
-                    do_translate(newfd,buff+1,db,client);
+                    res = do_translate(newfd,buff+1,db,client);
                 }
                 else if(3 == buff[0])  // 查看历史记录
                 {
-                    do_history(newfd,buff+1,db,client);
+                    res = do_history(newfd,buff+1,db,client);
                 }
+                else if(4 == buff[0])
+                {
+                    underline(client,db);
+                    printf("%s已下线\n",client);
+                    close(newfd);
+                    sqlite3_close(db);
+                    return 0;
+                }
+                else
+                    printf("程序出错\n");
+
+                if(res < 0)
+                {   
+                    underline(client,db);
+                    printf("%s已下线\n",client);
+                    close(newfd);
+                    sqlite3_close(db);
+                    return 0;
+                }    
             }
         }
     }

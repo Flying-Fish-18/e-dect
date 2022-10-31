@@ -108,7 +108,7 @@ int do_register(int sfd)
     }
 
     // 注册成功
-    printf("注册成功！！\n");
+    printf("\n注册成功！！\n");
     getchar();
     system("clear");
     return 0;
@@ -180,7 +180,7 @@ int do_login(int sfd)
 
 int option(int sfd)
 {
-    char buff[100] = "";
+    char buff = 4;
     int flag;
     while (1)
     {
@@ -202,6 +202,8 @@ int option(int sfd)
             do_history(sfd);
             break;
         case 3:
+            if (send(sfd, &buff, sizeof(buff), 0) < 0)
+                PRINT_ERR("send quit", -1);
             close(sfd);
             return 0;
             break;
@@ -241,7 +243,7 @@ int do_translate(int sfd)
         
         if(0 == buff[0])  // 单词不存在
         {
-            printf("\n单词查找,请重新输入!!\n\nn");
+            printf("\n单词查找失败,请重新输入!!\n\nn");
             continue;
         }
         strcpy(word,buff);  // 复制单词
