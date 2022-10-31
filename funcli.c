@@ -199,7 +199,7 @@ int option(int sfd)
             do_translate(sfd);
             break;
         case 2:
-            // do_history(sfd);
+            do_history(sfd);
             break;
         case 3:
             close(sfd);
@@ -249,8 +249,28 @@ int do_translate(int sfd)
         
         printf("\n\t%s\t\t%s\n\n",word,mean);
     }
-    
-
 
     return 0;
+}
+
+int do_history(int sfd)
+{
+    char buff[1000] = "";
+    int res;
+    buff[0] = 3;
+    if(send(sfd,buff,strlen(buff)+1,0) < 0)
+        PRINT_ERR("send history",-1);
+
+    res = recv(sfd,buff,sizeof(buff),0);
+    if(res < 0)
+        PRINT_ERR("recv history",-1);
+    else if(0 == res)
+        PRINT("对方已下线\n",-2);
+    
+    if(0 == buff[0])  // 历史记录不存在
+        printf("\n无历史记录!!\n\nn");
+
+    printf("%s",buff);
+    
+    getchar();
 }

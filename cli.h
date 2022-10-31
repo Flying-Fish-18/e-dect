@@ -27,4 +27,5 @@ int do_register(int sfd);
 int do_login(int sfd);
 int option(int sfd);
 int do_translate(int sfd);
+int do_history(int sfd);
 #endif

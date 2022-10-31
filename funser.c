@@ -172,7 +172,7 @@ int insert_history(char *word,sqlite3 *db,char *client)
     // 获取时间
     time_t now = time(NULL);
     struct tm *tim = localtime(&now);
-    char time[50] = "";
+    char time[50] = "";                 // 时间表
     sprintf(time,"%d.%d.%d  %d:%d:%d" \
                 ,tim->tm_year + 1900 \
                 ,tim->tm_mon + 1 \
@@ -181,7 +181,6 @@ int insert_history(char *word,sqlite3 *db,char *client)
                 ,tim->tm_min \
                 ,tim->tm_sec \
                 );
-    printf("%s\n",time);
 
     char opr[200] = "";
     sprintf(opr,"insert into history values (\"%s\",'%s',\"%s\");" \
@@ -191,4 +190,34 @@ int insert_history(char *word,sqlite3 *db,char *client)
 }
 
 
-int do_history(int newfd,char *history,sqlite3 *db,char *client);
+int do_history(int newfd,char *history,sqlite3 *db,char *client)
+{
+    char buff[800] = "";
+    char temp[100] = "";
+    char opr[200] = "";
+    char **p_res;
+    int prow;
+    int pcol;
+    sprintf(opr,"select word,time from history where username == \"%s\";",client);
+    if (sqlite3_get_table(db, opr, &p_res, &prow, &pcol,NULL) != SQLITE_OK)
+          PRINT_SQL("select username from user\n", -1);
+
+    if(0 == prow)
+    {
+        buff[0] = 0;
+        if(send(newfd,buff,2,0) < 0)
+            PRINT_ERR("send history",-1);
+    }
+    else
+    {
+        for (int i = 0; i <= pcol*(1+prow)-1; i = i+2)
+        {
+            sprintf(temp,"\t\t%s\t%s\n",p_res[i],p_res[i+1]);
+            strcat(buff,temp);
+        }
+        if(send(newfd,buff,strlen(buff)+1,0) < 0)
+                PRINT_ERR("send history",-1);
+    }
+    return 0;
+    
+}

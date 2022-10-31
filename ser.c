@@ -86,7 +86,7 @@ int main(int argc, char const *argv[])
                 }
                 else if(3 == buff[0])  // 查看历史记录
                 {
-                    // do_history(newfd,buff+1,db,client);
+                    do_history(newfd,buff+1,db,client);
                 }
             }
         }
